@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Dental X-Ray Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --dark: #343a40;
+            --light: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+        }
+        
+        /* Upload Screen - Same as before */
+        .upload-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .upload-container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .upload-title {
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .upload-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .upload-box {
+            border: 3px dashed var(--primary);
+            border-radius: 15px;
+            padding: 50px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .upload-box:hover {
+            border-color: var(--secondary);
+            transform: translateY(-5px);
+        }
+        
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        input[type="file"] { display: none; }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        /* Analysis Screen */
+        .analysis-screen {
+            display: none;
+            min-height: 100vh;
+            background: #f0f2f5;
+        }
+        
+        .analysis-screen.active { display: block; }
+        
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar-brand {
+            font-size: 1.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .navbar-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-sm {
+            padding: 8px 20px;
+            font-size: 0.9em;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+        
+        .main-container {
+            display: flex;
+            height: calc(100vh - 130px);
+        }
+        
+        .sidebar {
+            width: 320px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .control-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .control-section:last-child { border-bottom: none; }
+        
+        .control-title {
+            font-size: 0.85em;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        
+        .view-toggle {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .view-btn {
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        .view-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .toggle-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+        }
+        
+        .toggle-label { font-size: 0.95em; color: #333; }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .toggle-switch input { display: none; }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 26px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px; width: 20px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+        
+        .slider-container { padding: 10px 0; }
+        
+        .slider-value {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+        
+        .slider-value span:last-child {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: #e9ecef;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            cursor: pointer;
+        }
+        
+        /* Severity Filter */
+        .severity-filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        
+        .severity-badge {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .severity-badge.high {
+            background: #fee;
+            color: #dc3545;
+        }
+        
+        .severity-badge.medium {
+            background: #fff3cd;
+            color: #ffc107;
+        }
+        
+        .severity-badge.low {
+            background: #d1ecf1;
+            color: #17a2b8;
+        }
+        
+        .severity-badge.info {
+            background: #e7e7e7;
+            color: #666;
+        }
+        
+        .severity-badge.active {
+            border-color: currentColor;
+            transform: scale(1.05);
+        }
+        
+        .class-filter-list {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        
+        .class-filter-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-radius: 5px;
+        }
+        
+        .class-filter-item:hover { background: #f8f9fa; }
+        
+        .class-filter-item input[type="checkbox"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        .class-color-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 10px;
+            border: 2px solid white;
+            box-shadow: 0 0 3px rgba(0,0,0,0.2);
+        }
+        
+        .class-name { flex: 1; font-size: 0.9em; }
+        
+        .class-count {
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        
+        .class-count.zero {
+            background: #e9ecef;
+            color: #999;
+        }
+        
+        .detection-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .detection-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .detection-item.highlighted {
+            border-left-color: var(--warning);
+            background: #fff3cd;
+        }
+        
+        .detection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .detection-label {
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+        
+        .detection-severity {
+            font-size: 0.75em;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .detection-severity.high { background: #dc3545; color: white; }
+        .detection-severity.medium { background: #ffc107; color: white; }
+        .detection-severity.low { background: #17a2b8; color: white; }
+        .detection-severity.info { background: #6c757d; color: white; }
+        
+        .detection-confidence {
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        /* Canvas Container */
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: #f0f2f5;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .canvas-wrapper {
+            position: relative;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        #imageCanvas {
+            display: block;
+            max-width: 100%;
+            max-height: calc(100vh - 200px);
+            border-radius: 10px;
+            cursor: crosshair;
+        }
+        
+        /* Hover Label Tooltip */
+        .hover-label {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            max-width: 250px;
+        }
+        
+        .hover-label.active {
+            display: block;
+            animation: tooltipFade 0.2s ease-out;
+        }
+        
+        @keyframes tooltipFade {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .hover-label-title {
+            font-weight: 700;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .hover-label-info {
+            font-size: 12px;
+            color: #ccc;
+        }
+        
+        /* Measurement Tool */
+        .measurement-line {
+            position: absolute;
+            pointer-events: none;
+        }
+        
+        .measurement-label {
+            position: absolute;
+            background: var(--primary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            pointer-events: none;
+        }
+        
+        /* Tool Modes */
+        .tool-modes {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .tool-btn {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #e9ecef;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .tool-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .zoom-controls {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            gap: 5px;
+            padding: 8px;
+        }
+        
+        .zoom-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+        
+        .zoom-level {
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .loading-overlay.active { display: flex; }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Enhanced Stats Bar */
+        .stats-bar {
+            background: white;
+            padding: 12px 30px;
+            display: flex;
+            gap: 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 140px;
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+        
+        .stat-icon.primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+        
+        .stat-icon.danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+        
+        .stat-icon.warning {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: white;
+        }
+        
+        .stat-icon.info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+        }
+        
+        .stat-content {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-label {
+            font-size: 0.75em;
+            color: #666;
+        }
+        
+        .stat-value {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        /* Heatmap removed (no longer used) */
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Upload Screen -->
+    <div class="upload-screen" id="uploadScreen">
+        <div class="upload-container">
+            <h1 class="upload-title">🦷 Advanced Dental X-Ray Analysis</h1>
+            <p class="upload-subtitle">AI-Powered Diagnostic Platform with Smart Detection</p>
+            
+            <div class="upload-box" id="uploadBox">
+                <div class="upload-icon">📤</div>
+                <div>
+                    <strong>Click to upload</strong> or drag and drop<br>
+                    <small style="color: #999;">JPG, PNG supported</small>
+                </div>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+            
+            <button class="btn" id="analyzeBtn" disabled>Analyze Image</button>
+        </div>
+    </div>
+    
+    <!-- Analysis Screen -->
+    <div class="analysis-screen" id="analysisScreen">
+        <div class="navbar">
+            <div class="navbar-brand">🦷 Advanced Dental Analysis</div>
+            <div class="navbar-actions">
+                <button class="btn-sm btn-primary" onclick="generateReport()">📊 Generate Report</button>
+                <button class="btn-sm btn-primary" onclick="exportImage()">📥 Export Image</button>
+                <button class="btn-sm btn-primary" onclick="resetAnalysis()">🔄 New Analysis</button>
+            </div>
+        </div>
+        
+        <div class="main-container">
+            <div class="sidebar">
+                <!-- View Mode -->
+                <div class="control-section">
+                    <div class="control-title">View Mode</div>
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="annotated" onclick="changeView('annotated')">
+                            📊 Annotated
+                        </button>
+                        <button class="view-btn" data-view="original" onclick="changeView('original')">
+                            🖼️ Original
+                        </button>
+                    </div>
+                    <div class="view-toggle" style="grid-template-columns: 1fr;">
+                        <button class="view-btn" data-view="split" onclick="changeView('split')">
+                            ⚖️ Side by Side
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Tool Modes -->
+                <div class="control-section">
+                    <div class="control-title">Interaction Mode</div>
+                    <div class="tool-modes">
+                        <button class="tool-btn active" data-tool="view" onclick="changeTool('view')">
+                            👁️ View
+                        </button>
+                        <button class="tool-btn" data-tool="measure" onclick="changeTool('measure')">
+                            📏 Measure
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Display Options -->
+                <div class="control-section">
+                    <div class="control-title">Display Options</div>
+                    <div class="toggle-item">
+                        <span class="toggle-label">Show Bounding Boxes</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="showBoxes" checked onchange="redrawCanvas()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-item">
+                        <span class="toggle-label">Labels on Hover Only</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="hoverLabels" checked onchange="redrawCanvas()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-item">
+                        <span class="toggle-label">Show Segmentation</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="showSegmentation" checked onchange="redrawCanvas()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <!-- Heatmap option removed -->
+                </div>
+                
+                <!-- Confidence Threshold -->
+                <div class="control-section">
+                    <div class="control-title">Confidence Threshold</div>
+                    <div class="slider-container">
+                        <div class="slider-value">
+                            <span>Minimum</span>
+                            <span id="confidenceValue">0.25</span>
+                        </div>
+                        <input type="range" id="confidenceSlider" min="0" max="100" value="25" 
+                               oninput="updateConfidence(this.value)">
+                    </div>
+                </div>
+                
+                <!-- Severity filter removed -->
+                
+                <!-- Class Filters -->
+                <div class="control-section">
+                    <div class="control-title">
+                        Detection Classes
+                        <button class="btn-sm" style="float: right; padding: 4px 12px; font-size: 0.75em;" 
+                                onclick="toggleAllClasses()">Toggle All</button>
+                    </div>
+                    <div class="class-filter-list" id="classFilterList"></div>
+                </div>
+                
+                <!-- Detections List -->
+                <div class="control-section">
+                    <div class="control-title">Detections (<span id="detectionCount">0</span>)</div>
+                    <div id="detectionList"></div>
+                </div>
+            </div>
+            
+            <!-- Canvas Area -->
+            <div class="canvas-container">
+                <div class="canvas-wrapper" id="canvasWrapper">
+                    <canvas id="imageCanvas"></canvas>
+                    <div class="hover-label" id="hoverLabel">
+                        <div class="hover-label-title"></div>
+                        <div class="hover-label-info"></div>
+                    </div>
+                </div>
+                
+                <div class="zoom-controls">
+                    <button class="zoom-btn" onclick="zoomIn()">+</button>
+                    <div class="zoom-level" id="zoomLevel">100%</div>
+                    <button class="zoom-btn" onclick="zoomOut()">−</button>
+                    <button class="zoom-btn" onclick="resetZoom()" title="Reset">⟲</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Enhanced Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-icon primary">📊</div>
+                <div class="stat-content">
+                    <div class="stat-label">Total Findings</div>
+                    <div class="stat-value" id="totalFindings">0</div>
+                </div>
+            </div>
+            <!-- High/Medium severity stats removed -->
+            <div class="stat-item">
+                <div class="stat-icon info">🎯</div>
+                <div class="stat-content">
+                    <div class="stat-label">Visible</div>
+                    <div class="stat-value" id="visibleFindings">0</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon primary">📏</div>
+                <div class="stat-content">
+                    <div class="stat-label">Combined</div>
+                    <div class="stat-value" id="combinedCount">0</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon primary">📐</div>
+                <div class="stat-content">
+                    <div class="stat-label">Avg Confidence</div>
+                    <div class="stat-value" id="avgConfidence">0%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="loading-overlay" id="loadingOverlay">
+        <div>
+            <div class="spinner"></div>
+            <p style="margin-top: 20px; font-weight: 600;">Analyzing X-ray with AI...</p>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        // Global variables
+        let analysisData = null;
+        let originalImage = null;
+        let canvas = null;
+        let ctx = null;
+        let currentView = 'annotated';
+        let currentTool = 'view';
+        let zoomLevel = 1;
+        let confidenceThreshold = 0.25;
+        let panX = 0;
+        let panY = 0;
+        let isPanning = false;
+        let panStart = {x: 0, y: 0};
+        let panStartPan = {x: 0, y: 0};
+        let enabledClasses = new Set();
+        // severity filter removed
+        let highlightedDetection = null;
+        let measurementPoints = [];
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            canvas = document.getElementById('imageCanvas');
+            ctx = canvas.getContext('2d');
+            setupUploadHandlers();
+            setupCanvasInteraction();
+        });
+        
+        function setupUploadHandlers() {
+            const fileInput = document.getElementById('fileInput');
+            const uploadBox = document.getElementById('uploadBox');
+            
+            fileInput.addEventListener('change', (e) => {
+                handleFileSelect(e.target.files[0]);
+                if (e.target.files && e.target.files[0]) {
+                    document.getElementById('analyzeBtn').disabled = false;
+                    analyzeImage();
+                }
+            });
+            uploadBox.addEventListener('click', () => fileInput.click());
+            uploadBox.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadBox.style.borderColor = 'var(--secondary)';
+            });
+            uploadBox.addEventListener('dragleave', () => {
+                uploadBox.style.borderColor = 'var(--primary)';
+            });
+            uploadBox.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadBox.style.borderColor = 'var(--primary)';
+                handleFileSelect(e.dataTransfer.files[0]);
+            });
+            document.getElementById('analyzeBtn').addEventListener('click', analyzeImage);
+            // Auto-analysis handled in the single change handler above
+        }
+        
+        function setupCanvasInteraction() {
+            const canvasWrapper = document.getElementById('canvasWrapper');
+            const hoverLabel = document.getElementById('hoverLabel');
+            
+            canvas.addEventListener('mousemove', (e) => {
+                if (!analysisData || currentView === 'original') return;
+
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                // canvas pixel coords
+                const x_canvas = (e.clientX - rect.left) * scaleX;
+                const y_canvas = (e.clientY - rect.top) * scaleY;
+
+                // map to image space accounting for pan/zoom
+                const imgX = (x_canvas - panX) / zoomLevel;
+                const imgY = (y_canvas - panY) / zoomLevel;
+
+                const offsetX = currentView === 'split' ? originalImage.width : 0;
+                const detection = findDetectionAtPoint(imgX - offsetX, imgY);
+
+                if (detection && document.getElementById('hoverLabels').checked) {
+                    const title = hoverLabel.querySelector('.hover-label-title');
+                    const info = hoverLabel.querySelector('.hover-label-info');
+                    
+                    title.textContent = detection.label;
+                    info.innerHTML = `
+                        Confidence: ${(detection.confidence * 100).toFixed(1)}%<br>
+                        Severity: ${detection.severity.toUpperCase()}<br>
+                        ${detection.merged_count > 1 ? `Combined: ${detection.merged_count} detections` : ''}
+                    `;
+                    
+                    hoverLabel.style.left = (e.clientX + 15) + 'px';
+                    hoverLabel.style.top = (e.clientY + 15) + 'px';
+                    hoverLabel.classList.add('active');
+                } else {
+                    hoverLabel.classList.remove('active');
+                }
+            });
+            
+            canvas.addEventListener('mouseleave', () => {
+                hoverLabel.classList.remove('active');
+            });
+            
+            canvas.addEventListener('click', (e) => {
+                if (currentTool === 'measure') {
+                    handleMeasurementClick(e);
+                }
+            });
+
+            // Zoom with mouse wheel (zoom toward cursor)
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                if (!originalImage) return;
+
+                const rect = canvas.getBoundingClientRect();
+                const scale = canvas.width / rect.width;
+                const cx_canvas = (e.clientX - rect.left) * scale;
+                const cy_canvas = (e.clientY - rect.top) * scale;
+
+                const imgX = (cx_canvas - panX) / zoomLevel;
+                const imgY = (cy_canvas - panY) / zoomLevel;
+
+                const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                const newZoom = Math.min(3, Math.max(0.5, +(zoomLevel + delta).toFixed(2)));
+
+                // update pan so the image point under cursor remains stationary
+                panX = cx_canvas - imgX * newZoom;
+                panY = cy_canvas - imgY * newZoom;
+                zoomLevel = newZoom;
+                redrawCanvas();
+                document.getElementById('zoomLevel').textContent = `${Math.round(zoomLevel * 100)}%`;
+            }, { passive: false });
+
+            // Drag to pan
+            canvas.addEventListener('mousedown', (e) => {
+                if (currentTool === 'measure') return;
+                isPanning = true;
+                panStart.x = e.clientX;
+                panStart.y = e.clientY;
+                panStartPan.x = panX;
+                panStartPan.y = panY;
+                canvas.style.cursor = 'grabbing';
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isPanning) return;
+                const rect = canvas.getBoundingClientRect();
+                const scale = canvas.width / rect.width;
+                const dx_canvas = (e.clientX - panStart.x) * scale;
+                const dy_canvas = (e.clientY - panStart.y) * scale;
+                panX = panStartPan.x + dx_canvas;
+                panY = panStartPan.y + dy_canvas;
+                redrawCanvas();
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isPanning) {
+                    isPanning = false;
+                    canvas.style.cursor = currentTool === 'measure' ? 'crosshair' : 'default';
+                }
+            });
+        }
+        
+        function findDetectionAtPoint(x, y) {
+            const filtered = getFilteredDetections();
+            for (let det of filtered) {
+                const bbox = det.bounding_box;
+                if (x >= bbox.x1 && x <= bbox.x2 && y >= bbox.y1 && y <= bbox.y2) {
+                    return det;
+                }
+            }
+            return null;
+        }
+        
+        function handleMeasurementClick(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x_canvas = (e.clientX - rect.left) * scaleX;
+            const y_canvas = (e.clientY - rect.top) * scaleY;
+
+            const x = (x_canvas - panX) / zoomLevel;
+            const y = (y_canvas - panY) / zoomLevel;
+
+            measurementPoints.push({x, y});
+            
+            if (measurementPoints.length === 2) {
+                const dist = Math.sqrt(
+                    Math.pow(measurementPoints[1].x - measurementPoints[0].x, 2) +
+                    Math.pow(measurementPoints[1].y - measurementPoints[0].y, 2)
+                );
+                alert(`Distance: ${dist.toFixed(2)} pixels`);
+                measurementPoints = [];
+            }
+            
+            redrawCanvas();
+        }
+        
+        function handleFileSelect(file) {
+            if (file && file.type.startsWith('image/')) {
+                document.getElementById('analyzeBtn').disabled = false;
+            }
+        }
+        
+        async function analyzeImage() {
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files[0]) return;
+            
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+            
+            document.getElementById('loadingOverlay').classList.add('active');
+            
+            try {
+                const response = await fetch('http://localhost:5000/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) throw new Error('Analysis failed');
+                
+                analysisData = await response.json();
+                
+                originalImage = new Image();
+                originalImage.onload = () => {
+                    initializeAnalysisView();
+                };
+                originalImage.src = analysisData.original_image;
+                
+            } catch (error) {
+                alert('Error: ' + error.message);
+                document.getElementById('loadingOverlay').classList.remove('active');
+            }
+        }
+        
+        function initializeAnalysisView() {
+            document.getElementById('uploadScreen').style.display = 'none';
+            document.getElementById('analysisScreen').classList.add('active');
+            document.getElementById('loadingOverlay').classList.remove('active');
+            
+            analysisData.classes.forEach(cls => {
+                if (cls.count > 0) {
+                    enabledClasses.add(cls.name);
+                }
+            });
+            
+            setupClassFilters();
+            updateStats();
+            redrawCanvas();
+            // Heatmap removed
+        }
+        
+        function setupClassFilters() {
+            const filterList = document.getElementById('classFilterList');
+            filterList.innerHTML = '';
+            
+            // Sort by severity then count
+            const sortedClasses = [...analysisData.classes].sort((a, b) => {
+                const severityOrder = {high: 0, medium: 1, low: 2, info: 3};
+                if (severityOrder[a.severity] !== severityOrder[b.severity]) {
+                    return severityOrder[a.severity] - severityOrder[b.severity];
+                }
+                return b.count - a.count;
+            });
+            
+            sortedClasses.forEach(cls => {
+                const div = document.createElement('div');
+                div.className = 'class-filter-item';
+                div.innerHTML = `
+                    <input type="checkbox" id="class_${cls.name}" 
+                           ${cls.count > 0 ? 'checked' : ''} 
+                           onchange="toggleClass('${cls.name}')">
+                    <div class="class-color-box" style="background: rgb(${cls.color.r}, ${cls.color.g}, ${cls.color.b})"></div>
+                    <span class="class-name">${cls.name}</span>
+                    <span class="class-count ${cls.count === 0 ? 'zero' : ''}">${cls.count}</span>
+                `;
+                filterList.appendChild(div);
+            });
+        }
+        
+        function toggleClass(className) {
+            if (enabledClasses.has(className)) {
+                enabledClasses.delete(className);
+            } else {
+                enabledClasses.add(className);
+            }
+            redrawCanvas();
+            updateDetectionList();
+        }
+        
+        function toggleAllClasses() {
+            if (enabledClasses.size > 0) {
+                enabledClasses.clear();
+                analysisData.classes.forEach(cls => {
+                    document.getElementById(`class_${cls.name}`).checked = false;
+                });
+            } else {
+                analysisData.classes.forEach(cls => {
+                    if (cls.count > 0) {
+                        enabledClasses.add(cls.name);
+                        document.getElementById(`class_${cls.name}`).checked = true;
+                    }
+                });
+            }
+            redrawCanvas();
+            updateDetectionList();
+        }
+        
+        // Severity toggle removed
+        
+        function changeTool(tool) {
+            currentTool = tool;
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-tool="${tool}"]`).classList.add('active');
+            canvas.style.cursor = tool === 'measure' ? 'crosshair' : 'default';
+            measurementPoints = [];
+            redrawCanvas();
+        }
+        
+        function changeView(view) {
+            currentView = view;
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-view="${view}"]`).classList.add('active');
+            redrawCanvas();
+        }
+        
+        function updateConfidence(value) {
+            confidenceThreshold = value / 100;
+            document.getElementById('confidenceValue').textContent = confidenceThreshold.toFixed(2);
+            redrawCanvas();
+            updateDetectionList();
+        }
+        
+        function redrawCanvas() {
+            if (!originalImage || !analysisData) return;
+            
+            const showBoxes = document.getElementById('showBoxes').checked;
+            const hoverLabels = document.getElementById('hoverLabels').checked;
+            const showSegmentation = document.getElementById('showSegmentation').checked;
+            
+            // Resize canvas (this resets transform/state)
+            if (currentView === 'split') {
+                canvas.width = originalImage.width * 2;
+                canvas.height = originalImage.height;
+            } else {
+                canvas.width = originalImage.width;
+                canvas.height = originalImage.height;
+            }
+
+            // Clear and apply pan/zoom transform on drawing context
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.setTransform(zoomLevel, 0, 0, zoomLevel, panX, panY);
+
+            if (currentView === 'split') {
+                ctx.drawImage(originalImage, 0, 0);
+                ctx.drawImage(originalImage, originalImage.width, 0);
+                drawAnnotations(originalImage.width, showBoxes, !hoverLabels, showSegmentation);
+            } else if (currentView === 'original') {
+                ctx.drawImage(originalImage, 0, 0);
+            } else {
+                ctx.drawImage(originalImage, 0, 0);
+                drawAnnotations(0, showBoxes, !hoverLabels, showSegmentation);
+            }
+            
+            if (currentTool === 'measure' && measurementPoints.length > 0) {
+                drawMeasurementPoints();
+            }
+            
+            updateStats();
+            updateDetectionList();
+        }
+        
+        function drawAnnotations(offsetX, showBoxes, showLabels, showSegmentation) {
+            const filtered = getFilteredDetections();
+            
+            if (showSegmentation) {
+                filtered.forEach(det => {
+                    if (det.segmentation) {
+                        ctx.globalAlpha = 0.3;
+                        ctx.fillStyle = `rgb(${det.color.r}, ${det.color.g}, ${det.color.b})`;
+                        ctx.beginPath();
+                        det.segmentation.forEach((point, i) => {
+                            if (i === 0) ctx.moveTo(point.x + offsetX, point.y);
+                            else ctx.lineTo(point.x + offsetX, point.y);
+                        });
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.globalAlpha = 1;
+                    }
+                });
+            }
+            
+            filtered.forEach(det => {
+                const bbox = det.bounding_box;
+                const color = `rgb(${det.color.r}, ${det.color.g}, ${det.color.b})`;
+                const isHighlighted = highlightedDetection === det.id;
+                
+                if (showBoxes) {
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = isHighlighted ? 4 : 2;
+                    ctx.strokeRect(bbox.x1 + offsetX, bbox.y1, bbox.x2 - bbox.x1, bbox.y2 - bbox.y1);
+                    
+                    // Add corner accents for highlighted
+                    if (isHighlighted) {
+                        const cornerSize = 10;
+                        ctx.lineWidth = 3;
+                        // Top-left
+                        ctx.beginPath();
+                        ctx.moveTo(bbox.x1 + offsetX, bbox.y1 + cornerSize);
+                        ctx.lineTo(bbox.x1 + offsetX, bbox.y1);
+                        ctx.lineTo(bbox.x1 + offsetX + cornerSize, bbox.y1);
+                        ctx.stroke();
+                        // Top-right
+                        ctx.beginPath();
+                        ctx.moveTo(bbox.x2 + offsetX - cornerSize, bbox.y1);
+                        ctx.lineTo(bbox.x2 + offsetX, bbox.y1);
+                        ctx.lineTo(bbox.x2 + offsetX, bbox.y1 + cornerSize);
+                        ctx.stroke();
+                        // Bottom-left
+                        ctx.beginPath();
+                        ctx.moveTo(bbox.x1 + offsetX, bbox.y2 - cornerSize);
+                        ctx.lineTo(bbox.x1 + offsetX, bbox.y2);
+                        ctx.lineTo(bbox.x1 + offsetX + cornerSize, bbox.y2);
+                        ctx.stroke();
+                        // Bottom-right
+                        ctx.beginPath();
+                        ctx.moveTo(bbox.x2 + offsetX - cornerSize, bbox.y2);
+                        ctx.lineTo(bbox.x2 + offsetX, bbox.y2);
+                        ctx.lineTo(bbox.x2 + offsetX, bbox.y2 - cornerSize);
+                        ctx.stroke();
+                    }
+                }
+                
+                if (showLabels) {
+                    const labelText = `${det.label} ${(det.confidence * 100).toFixed(0)}%`;
+                    const fontSize = Math.max(12, canvas.width / 60);
+                    ctx.font = `bold ${fontSize}px Arial`;
+                    
+                    const textMetrics = ctx.measureText(labelText);
+                    const padding = 6;
+                    const labelX = bbox.x1 + offsetX;
+                    const labelY = bbox.y1 - fontSize - padding * 2 - 5;
+                    
+                    ctx.fillStyle = color;
+                    ctx.fillRect(labelX, labelY, textMetrics.width + padding * 2, fontSize + padding * 2);
+                    ctx.fillStyle = 'white';
+                    ctx.fillText(labelText, labelX + padding, labelY + fontSize + padding - 2);
+                }
+            });
+        }
+        
+        function drawMeasurementPoints() {
+            measurementPoints.forEach((point, i) => {
+                ctx.fillStyle = 'red';
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                if (i > 0) {
+                    ctx.strokeStyle = 'red';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(measurementPoints[i-1].x, measurementPoints[i-1].y);
+                    ctx.lineTo(point.x, point.y);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            });
+        }
+        
+        function getFilteredDetections() {
+            return analysisData.detections.filter(det => 
+                det.confidence >= confidenceThreshold &&
+                enabledClasses.has(det.label)
+            );
+        }
+        
+        function updateDetectionList() {
+            const detectionList = document.getElementById('detectionList');
+            const filtered = getFilteredDetections();
+            
+            detectionList.innerHTML = '';
+            filtered.forEach(det => {
+                const div = document.createElement('div');
+                div.className = 'detection-item' + (highlightedDetection === det.id ? ' highlighted' : '');
+                div.onclick = () => highlightDetection(det.id);
+                div.innerHTML = `
+                    <div class="detection-header">
+                        <span class="detection-label">${det.label}</span>
+                        <span class="detection-severity ${det.severity}">${det.severity.toUpperCase()}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85em; color: #666; margin-top: 4px;">
+                        <span>${(det.confidence * 100).toFixed(1)}%</span>
+                        ${det.merged_count > 1 ? `<span>Combined: ${det.merged_count}</span>` : ''}
+                    </div>
+                `;
+                detectionList.appendChild(div);
+            });
+            
+            document.getElementById('detectionCount').textContent = filtered.length;
+        }
+        
+        function highlightDetection(id) {
+            highlightedDetection = highlightedDetection === id ? null : id;
+            redrawCanvas();
+            updateDetectionList();
+        }
+        
+        function updateStats() {
+            const filtered = getFilteredDetections();
+            const stats = analysisData.statistics;
+            
+            document.getElementById('totalFindings').textContent = stats.total_detections;
+            document.getElementById('visibleFindings').textContent = filtered.length;
+            document.getElementById('combinedCount').textContent = stats.combined_count || 0;
+            document.getElementById('avgConfidence').textContent = 
+                (stats.average_confidence * 100).toFixed(1) + '%';
+        }
+        
+        // Heatmap functions removed
+        
+        // Heatmap toggle removed
+        
+        function zoomIn() {
+            const cx_canvas = canvas.width / 2;
+            const cy_canvas = canvas.height / 2;
+            const imgX = (cx_canvas - panX) / zoomLevel;
+            const imgY = (cy_canvas - panY) / zoomLevel;
+            const newZoom = Math.min(3, Math.max(0.5, +(zoomLevel + 0.2).toFixed(2)));
+            panX = cx_canvas - imgX * newZoom;
+            panY = cy_canvas - imgY * newZoom;
+            zoomLevel = newZoom;
+            redrawCanvas();
+            document.getElementById('zoomLevel').textContent = `${Math.round(zoomLevel * 100)}%`;
+        }
+
+        function zoomOut() {
+            const cx_canvas = canvas.width / 2;
+            const cy_canvas = canvas.height / 2;
+            const imgX = (cx_canvas - panX) / zoomLevel;
+            const imgY = (cy_canvas - panY) / zoomLevel;
+            const newZoom = Math.min(3, Math.max(0.5, +(zoomLevel - 0.2).toFixed(2)));
+            panX = cx_canvas - imgX * newZoom;
+            panY = cy_canvas - imgY * newZoom;
+            zoomLevel = newZoom;
+            redrawCanvas();
+            document.getElementById('zoomLevel').textContent = `${Math.round(zoomLevel * 100)}%`;
+        }
+
+        function resetZoom() {
+            zoomLevel = 1;
+            panX = 0;
+            panY = 0;
+            redrawCanvas();
+            document.getElementById('zoomLevel').textContent = `${Math.round(zoomLevel * 100)}%`;
+        }
+        
+        async function exportImage() {
+            if (!originalImage || !analysisData) return;
+
+            // Create temporary canvas for side-by-side image
+            const w = originalImage.width;
+            const h = originalImage.height;
+            const tmp = document.createElement('canvas');
+            tmp.width = w * 2;
+            tmp.height = h;
+            const tctx = tmp.getContext('2d');
+
+            // Draw original on left
+            tctx.drawImage(originalImage, 0, 0, w, h);
+
+            // Draw annotated on right
+            tctx.drawImage(originalImage, w, 0, w, h);
+
+            // Draw annotations onto right side
+            const filtered = getFilteredDetections();
+            filtered.forEach(det => {
+                const bbox = det.bounding_box;
+                const color = `rgb(${det.color.r}, ${det.color.g}, ${det.color.b})`;
+
+                // segmentation (if present)
+                if (det.segmentation) {
+                    tctx.globalAlpha = 0.3;
+                    tctx.fillStyle = color;
+                    tctx.beginPath();
+                    det.segmentation.forEach((pt, i) => {
+                        const x = pt.x + w; // shift to right half
+                        const y = pt.y;
+                        if (i === 0) tctx.moveTo(x, y);
+                        else tctx.lineTo(x, y);
+                    });
+                    tctx.closePath();
+                    tctx.fill();
+                    tctx.globalAlpha = 1;
+                }
+
+                // bounding box
+                tctx.strokeStyle = color;
+                tctx.lineWidth = 3;
+                tctx.strokeRect(bbox.x1 + w, bbox.y1, bbox.x2 - bbox.x1, bbox.y2 - bbox.y1);
+
+                // label
+                const labelText = `${det.label} ${(det.confidence * 100).toFixed(0)}%`;
+                const fontSize = Math.max(12, w / 60);
+                tctx.font = `bold ${fontSize}px Arial`;
+                const metrics = tctx.measureText(labelText);
+                const padding = 6;
+                const lx = bbox.x1 + w;
+                const ly = Math.max(0, bbox.y1 - fontSize - padding * 2 - 5);
+                tctx.fillStyle = color;
+                tctx.fillRect(lx, ly, metrics.width + padding * 2, fontSize + padding * 2);
+                tctx.fillStyle = 'white';
+                tctx.fillText(labelText, lx + padding, ly + fontSize + padding - 2);
+            });
+
+            // Download
+            tmp.toBlob(async (blob) => {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                const filename = `dental_export_${Date.now()}.png`;
+                link.href = url;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                URL.revokeObjectURL(url);
+
+                // Also POST to server to save copy
+                try {
+                    const reader = new FileReader();
+                    reader.onloadend = async () => {
+                        const dataUrl = reader.result;
+                        await fetch('http://localhost:5000/save_export', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ image: dataUrl, filename })
+                        });
+                    };
+                    reader.readAsDataURL(blob);
+                } catch (err) {
+                    console.warn('Failed to POST export to server', err);
+                }
+            }, 'image/png');
+        }
+        
+        async function generateReport() {
+            if (!originalImage || !analysisData) return;
+
+            // Build side-by-side annotated image (reuse same approach as export)
+            const w = originalImage.width;
+            const h = originalImage.height;
+            const tmp = document.createElement('canvas');
+            tmp.width = w * 2;
+            tmp.height = h;
+            const tctx = tmp.getContext('2d');
+
+            // Draw original on left
+            tctx.drawImage(originalImage, 0, 0, w, h);
+
+            // Draw annotated on right (base image)
+            tctx.drawImage(originalImage, w, 0, w, h);
+
+            // Draw annotations onto right side
+            const filtered = getFilteredDetections();
+            filtered.forEach(det => {
+                const bbox = det.bounding_box;
+                const color = `rgb(${det.color.r}, ${det.color.g}, ${det.color.b})`;
+
+                if (det.segmentation) {
+                    tctx.globalAlpha = 0.3;
+                    tctx.fillStyle = color;
+                    tctx.beginPath();
+                    det.segmentation.forEach((pt, i) => {
+                        const x = pt.x + w;
+                        const y = pt.y;
+                        if (i === 0) tctx.moveTo(x, y);
+                        else tctx.lineTo(x, y);
+                    });
+                    tctx.closePath();
+                    tctx.fill();
+                    tctx.globalAlpha = 1;
+                }
+
+                tctx.strokeStyle = color;
+                tctx.lineWidth = 3;
+                tctx.strokeRect(bbox.x1 + w, bbox.y1, bbox.x2 - bbox.x1, bbox.y2 - bbox.y1);
+
+                const labelText = `${det.label} ${(det.confidence * 100).toFixed(0)}%`;
+                const fontSize = Math.max(12, w / 60);
+                tctx.font = `bold ${fontSize}px Arial`;
+                const metrics = tctx.measureText(labelText);
+                const padding = 6;
+                const lx = bbox.x1 + w;
+                const ly = Math.max(0, bbox.y1 - fontSize - padding * 2 - 5);
+                tctx.fillStyle = color;
+                tctx.fillRect(lx, ly, metrics.width + padding * 2, fontSize + padding * 2);
+                tctx.fillStyle = 'white';
+                tctx.fillText(labelText, lx + padding, ly + fontSize + padding - 2);
+            });
+
+            // Create PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const margin = 20;
+            let y = margin + 20;
+
+            doc.setFontSize(18);
+            doc.text('Dental X-Ray Analysis Report', margin, y);
+            y += 25;
+
+            doc.setFontSize(10);
+            doc.text(`Date: ${new Date().toLocaleString()}`, margin, y);
+            y += 15;
+            doc.text(`Image Dimensions: ${analysisData.image_dimensions.width} x ${analysisData.image_dimensions.height}`, margin, y);
+            y += 15;
+            doc.text(`Total Detections: ${analysisData.statistics.total_detections}`, margin, y);
+            y += 15;
+            doc.text(`Combined Detections: ${analysisData.statistics.combined_count || 0}`, margin, y);
+            y += 15;
+            doc.text(`Average Confidence: ${(analysisData.statistics.average_confidence * 100).toFixed(1)}%`, margin, y);
+            y += 20;
+
+            // Add image (fit width)
+            const imgMaxWidth = pageWidth - margin * 2;
+            const scale = imgMaxWidth / tmp.width;
+            const imgHeight = tmp.height * scale;
+            const dataUrl = tmp.toDataURL('image/png');
+            doc.addImage(dataUrl, 'PNG', margin, y, imgMaxWidth, imgHeight);
+            y += imgHeight + 15;
+
+            // Add detailed stats and distributions
+            doc.setFontSize(12);
+            doc.text('Spatial Distribution:', margin, y);
+            y += 14;
+            Object.entries(analysisData.statistics.spatial_distribution || analysisData.spatial_distribution || {}).forEach(([k, v]) => {
+                doc.text(`  • ${k}: ${v}`, margin + 8, y);
+                y += 12;
+            });
+            y += 6;
+
+            doc.text('Findings by Class:', margin, y);
+            y += 14;
+            Object.entries(analysisData.statistics.class_distribution || {}).forEach(([name, count]) => {
+                doc.text(`  • ${name}: ${count}`, margin + 8, y);
+                y += 12;
+                if (y > doc.internal.pageSize.getHeight() - 60) { doc.addPage(); y = margin; }
+            });
+
+            y += 8;
+            doc.text('Detections:', margin, y);
+            y += 14;
+
+            // Table-like list of detections
+            doc.setFontSize(10);
+            filtered.forEach(det => {
+                const bbox = det.bounding_box;
+                const line = `- ${det.label} | ${(det.confidence*100).toFixed(1)}% | bbox: (${Math.round(bbox.x1)},${Math.round(bbox.y1)})-(${Math.round(bbox.x2)},${Math.round(bbox.y2)})${det.merged_count>1? ' | Combined:'+det.merged_count : ''}`;
+                doc.text(line, margin + 8, y);
+                y += 12;
+                if (y > doc.internal.pageSize.getHeight() - 60) { doc.addPage(); y = margin; }
+            });
+
+            // Save PDF
+            doc.save(`dental_report_${Date.now()}.pdf`);
+        }
+        
+        function resetAnalysis() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>

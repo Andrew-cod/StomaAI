@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Dental X-Ray Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --dark: #343a40;
+            --light: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+        }
+        
+        .upload-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .upload-container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .upload-title {
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .upload-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .upload-box {
+            border: 3px dashed var(--primary);
+            border-radius: 15px;
+            padding: 50px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .upload-box:hover {
+            border-color: var(--secondary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+        
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .analysis-screen {
+            display: none;
+            min-height: 100vh;
+            background: #f0f2f5;
+        }
+        
+        .analysis-screen.active {
+            display: block;
+        }
+        
+        /* Top Navigation Bar */
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar-brand {
+            font-size: 1.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .navbar-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-sm {
+            padding: 8px 20px;
+            font-size: 0.9em;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+        
+        /* Left Sidebar - Controls */
+        .sidebar {
+            width: 320px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .control-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .control-section:last-child {
+            border-bottom: none;
+        }
+        
+        .control-title {
+            font-size: 0.85em;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        
+        /* View Mode Toggle */
+        .view-toggle {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .view-btn {
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        .view-btn.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        /* Toggle Switches */
+        .toggle-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+        }
+        
+        .toggle-label {
+            font-size: 0.95em;
+            color: #333;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .toggle-switch input {
+            display: none;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 26px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+        
+        /* Confidence Slider */
+        .slider-container {
+            padding: 10px 0;
+        }
+        
+        .slider-value {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+        
+        .slider-value span:last-child {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: #e9ecef;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            cursor: pointer;
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            cursor: pointer;
+            border: none;
+        }
+        
+        /* Class Filters */
+        .class-filter-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .class-filter-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-radius: 5px;
+            padding-left: 5px;
+        }
+        
+        .class-filter-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .class-filter-item input[type="checkbox"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        .class-color-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 10px;
+            border: 2px solid white;
+            box-shadow: 0 0 3px rgba(0,0,0,0.2);
+        }
+        
+        .class-name {
+            flex: 1;
+            font-size: 0.9em;
+        }
+        
+        .class-count {
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        
+        .class-count.zero {
+            background: #e9ecef;
+            color: #999;
+        }
+        
+        /* Detection List */
+        .detection-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .detection-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .detection-item.highlighted {
+            border-left-color: var(--warning);
+            background: #fff3cd;
+        }
+        
+        .detection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .detection-label {
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+        
+        .detection-confidence {
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .detection-coords {
+            font-size: 0.8em;
+            color: #999;
+        }
+        
+        /* Canvas Container */
+        .canvas-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: #f0f2f5;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .canvas-wrapper {
+            position: relative;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        #imageCanvas {
+            display: block;
+            max-width: 100%;
+            max-height: calc(100vh - 150px);
+            border-radius: 10px;
+        }
+        
+        /* Zoom Controls */
+        .zoom-controls {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            gap: 5px;
+            padding: 8px;
+        }
+        
+        .zoom-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.2s;
+        }
+        
+        .zoom-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .zoom-level {
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Stats Bar */
+        .stats-bar {
+            background: white;
+            padding: 15px 30px;
+            display: flex;
+            gap: 30px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+        
+        .stat-icon.primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+        
+        .stat-content {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-label {
+            font-size: 0.8em;
+            color: #666;
+        }
+        
+        .stat-value {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #c33;
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Upload Screen -->
+    <div class="upload-screen" id="uploadScreen">
+        <div class="upload-container">
+            <h1 class="upload-title">🦷 Dental X-Ray Analysis</h1>
+            <p class="upload-subtitle">Professional AI-Powered Diagnostic Tool</p>
+            
+            <div class="upload-box" id="uploadBox">
+                <div class="upload-icon">📤</div>
+                <div>
+                    <strong>Click to upload</strong> or drag and drop<br>
+                    <small style="color: #999;">Supported formats: JPG, PNG</small>
+                </div>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+            
+            <button class="btn" id="analyzeBtn" disabled>Analyze Image</button>
+            <div id="errorMsg"></div>
+        </div>
+    </div>
+    
+    <!-- Analysis Screen -->
+    <div class="analysis-screen" id="analysisScreen">
+        <!-- Navbar -->
+        <div class="navbar">
+            <div class="navbar-brand">🦷 Dental Analysis</div>
+            <div class="navbar-actions">
+                <button class="btn-sm btn-outline" onclick="exportResults()">📥 Export</button>
+                <button class="btn-sm btn-primary" onclick="resetAnalysis()">🔄 New Analysis</button>
+            </div>
+        </div>
+        
+        <!-- Main Container -->
+        <div class="main-container">
+            <!-- Left Sidebar -->
+            <div class="sidebar">
+                <!-- View Mode -->
+                <div class="control-section">
+                    <div class="control-title">View Mode</div>
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="annotated" onclick="changeView('annotated')">
+                            📊 Annotated
+                        </button>
+                        <button class="view-btn" data-view="original" onclick="changeView('original')">
+                            🖼️ Original
+                        </button>
+                    </div>
+                    <div class="view-toggle" style="grid-template-columns: 1fr;">
+                        <button class="view-btn" data-view="split" onclick="changeView('split')">
+                            ⚖️ Side by Side
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Display Options -->
+                <div class="control-section">
+                    <div class="control-title">Display Options</div>
+                    <div class="toggle-item">
+                        <span class="toggle-label">Show Bounding Boxes</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="showBoxes" checked onchange="redrawCanvas()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-item">
+                        <span class="toggle-label">Show Labels</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="showLabels" checked onchange="redrawCanvas()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-item">
+                        <span class="toggle-label">Show Confidence</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="showConfidence" checked onchange="redrawCanvas()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-item">
+                        <span class="toggle-label">Show Segmentation</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="showSegmentation" checked onchange="redrawCanvas()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Confidence Threshold -->
+                <div class="control-section">
+                    <div class="control-title">Confidence Threshold</div>
+                    <div class="slider-container">
+                        <div class="slider-value">
+                            <span>Minimum</span>
+                            <span id="confidenceValue">0.25</span>
+                        </div>
+                        <input type="range" id="confidenceSlider" min="0" max="100" value="25" oninput="updateConfidence(this.value)">
+                    </div>
+                </div>
+                
+                <!-- Class Filters -->
+                <div class="control-section">
+                    <div class="control-title">
+                        Detection Classes
+                        <button class="btn-sm" style="float: right; padding: 4px 12px; font-size: 0.75em;" onclick="toggleAllClasses()">
+                            Toggle All
+                        </button>
+                    </div>
+                    <div class="class-filter-list" id="classFilterList"></div>
+                </div>
+                
+                <!-- Detections List -->
+                <div class="control-section">
+                    <div class="control-title">Detections (<span id="detectionCount">0</span>)</div>
+                    <div id="detectionList"></div>
+                </div>
+            </div>
+            
+            <!-- Canvas Area -->
+            <div class="canvas-container">
+                <div class="canvas-wrapper">
+                    <canvas id="imageCanvas"></canvas>
+                </div>
+                
+                <!-- Zoom Controls -->
+                <div class="zoom-controls">
+                    <button class="zoom-btn" onclick="zoomIn()">+</button>
+                    <div class="zoom-level" id="zoomLevel">100%</div>
+                    <button class="zoom-btn" onclick="zoomOut()">−</button>
+                    <button class="zoom-btn" onclick="resetZoom()" title="Reset Zoom">⟲</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-icon primary">📊</div>
+                <div class="stat-content">
+                    <div class="stat-label">Total Findings</div>
+                    <div class="stat-value" id="totalFindings">0</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon primary">🎯</div>
+                <div class="stat-content">
+                    <div class="stat-label">Visible</div>
+                    <div class="stat-value" id="visibleFindings">0</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon primary">📏</div>
+                <div class="stat-content">
+                    <div class="stat-label">Image Size</div>
+                    <div class="stat-value" id="imageSize">-</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div>
+            <div class="spinner"></div>
+            <p style="margin-top: 20px; font-weight: 600; color: var(--dark);">Analyzing X-ray...</p>
+        </div>
+    </div>
+    
+    <script>
+        // Global variables
+        let analysisData = null;
+        let originalImage = null;
+        let canvas = null;
+        let ctx = null;
+        let currentView = 'annotated';
+        let zoomLevel = 1;
+        let confidenceThreshold = 0.25;
+        let enabledClasses = new Set();
+        let highlightedDetection = null;
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            canvas = document.getElementById('imageCanvas');
+            ctx = canvas.getContext('2d');
+            setupUploadHandlers();
+        });
+        
+        // Upload handlers
+        function setupUploadHandlers() {
+            const fileInput = document.getElementById('fileInput');
+            const uploadBox = document.getElementById('uploadBox');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            
+            fileInput.addEventListener('change', (e) => handleFileSelect(e.target.files[0]));
+            uploadBox.addEventListener('click', () => fileInput.click());
+            uploadBox.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadBox.style.borderColor = 'var(--secondary)';
+            });
+            uploadBox.addEventListener('dragleave', () => {
+                uploadBox.style.borderColor = 'var(--primary)';
+            });
+            uploadBox.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadBox.style.borderColor = 'var(--primary)';
+                handleFileSelect(e.dataTransfer.files[0]);
+            });
+            analyzeBtn.addEventListener('click', analyzeImage);
+        }
+        
+        function handleFileSelect(file) {
+            if (file && file.type.startsWith('image/')) {
+                document.getElementById('analyzeBtn').disabled = false;
+                document.getElementById('fileInput').dataset.file = 'selected';
+            }
+        }
+        
+        async function analyzeImage() {
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files[0]) return;
+            
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+            
+            document.getElementById('loadingOverlay').classList.add('active');
+            
+            try {
+                const response = await fetch('http://localhost:5000/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) throw new Error('Analysis failed');
+                
+                analysisData = await response.json();
+                
+                // Load original image
+                originalImage = new Image();
+                originalImage.onload = () => {
+                    initializeAnalysisView();
+                };
+                originalImage.src = analysisData.original_image;
+                
+            } catch (error) {
+                alert('Error: ' + error.message);
+                document.getElementById('loadingOverlay').classList.remove('active');
+            }
+        }
+        
+        function initializeAnalysisView() {
+            document.getElementById('uploadScreen').style.display = 'none';
+            document.getElementById('analysisScreen').classList.add('active');
+            document.getElementById('loadingOverlay').classList.remove('active');
+            
+            // Initialize all classes as enabled
+            analysisData.classes.forEach(cls => {
+                if (cls.count > 0) {
+                    enabledClasses.add(cls.name);
+                }
+            });
+            
+            setupClassFilters();
+            updateStats();
+            redrawCanvas();
+        }
+        
+        function setupClassFilters() {
+            const filterList = document.getElementById('classFilterList');
+            filterList.innerHTML = '';
+            
+            analysisData.classes.forEach(cls => {
+                const div = document.createElement('div');
+                div.className = 'class-filter-item';
+                div.innerHTML = `
+                    <input type="checkbox" id="class_${cls.name}" 
+                           ${cls.count > 0 ? 'checked' : ''} 
+                           onchange="toggleClass('${cls.name}')">
+                    <div class="class-color-box" style="background: rgb(${cls.color.r}, ${cls.color.g}, ${cls.color.b})"></div>
+                    <span class="class-name">${cls.name}</span>
+                    <span class="class-count ${cls.count === 0 ? 'zero' : ''}">${cls.count}</span>
+                `;
+                filterList.appendChild(div);
+            });
+        }
+        
+        function toggleClass(className) {
+            if (enabledClasses.has(className)) {
+                enabledClasses.delete(className);
+            } else {
+                enabledClasses.add(className);
+            }
+            redrawCanvas();
+            updateDetectionList();
+        }
+        
+        function toggleAllClasses() {
+            if (enabledClasses.size > 0) {
+                enabledClasses.clear();
+                analysisData.classes.forEach(cls => {
+                    document.getElementById(`class_${cls.name}`).checked = false;
+                });
+            } else {
+                analysisData.classes.forEach(cls => {
+                    if (cls.count > 0) {
+                        enabledClasses.add(cls.name);
+                        document.getElementById(`class_${cls.name}`).checked = true;
+                    }
+                });
+            }
+            redrawCanvas();
+            updateDetectionList();
+        }
+        
+        function changeView(view) {
+            currentView = view;
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-view="${view}"]`).classList.add('active');
+            redrawCanvas();
+        }
+        
+        function updateConfidence(value) {
+            confidenceThreshold = value / 100;
+            document.getElementById('confidenceValue').textContent = confidenceThreshold.toFixed(2);
+            redrawCanvas();
+            updateDetectionList();
+        }
+        
+        function redrawCanvas() {
+            if (!originalImage || !analysisData) return;
+            
+            const showBoxes = document.getElementById('showBoxes').checked;
+            const showLabels = document.getElementById('showLabels').checked;
+            const showConfidence = document.getElementById('showConfidence').checked;
+            const showSegmentation = document.getElementById('showSegmentation').checked;
+            
+            if (currentView === 'split') {
+                canvas.width = originalImage.width * 2;
+                canvas.height = originalImage.height;
+                
+                // Draw original
+                ctx.drawImage(originalImage, 0, 0);
+                
+                // Draw annotated
+                ctx.drawImage(originalImage, originalImage.width, 0);
+                drawAnnotations(originalImage.width, showBoxes, showLabels, showConfidence, showSegmentation);
+            } else if (currentView === 'original') {
+                canvas.width = originalImage.width;
+                canvas.height = originalImage.height;
+                ctx.drawImage(originalImage, 0, 0);
+            } else {
+                canvas.width = originalImage.width;
+                canvas.height = originalImage.height;
+                ctx.drawImage(originalImage, 0, 0);
+                drawAnnotations(0, showBoxes, showLabels, showConfidence, showSegmentation);
+            }
+            
+            updateStats();
+            updateDetectionList();
+        }
+        
+        function drawAnnotations(offsetX, showBoxes, showLabels, showConfidence, showSegmentation) {
+            const filteredDetections = getFilteredDetections();
+            
+            // Draw segmentation first (background)
+            if (showSegmentation) {
+                filteredDetections.forEach(det => {
+                    if (det.segmentation) {
+                        ctx.globalAlpha = 0.3;
+                        ctx.fillStyle = `rgb(${det.color.r}, ${det.color.g}, ${det.color.b})`;
+                        ctx.beginPath();
+                        det.segmentation.forEach((point, i) => {
+                            if (i === 0) {
+                                ctx.moveTo(point.x + offsetX, point.y);
+                            } else {
+                                ctx.lineTo(point.x + offsetX, point.y);
+                            }
+                        });
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.globalAlpha = 1;
+                    }
+                });
+            }
+            
+            // Draw bounding boxes and labels
+            filteredDetections.forEach(det => {
+                const isHighlighted = highlightedDetection === det.id;
+                const bbox = det.bounding_box;
+                const color = `rgb(${det.color.r}, ${det.color.g}, ${det.color.b})`;
+                
+                // Draw bounding box
+                if (showBoxes) {
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = isHighlighted ? 4 : 2;
+                    ctx.strokeRect(
+                        bbox.x1 + offsetX,
+                        bbox.y1,
+                        bbox.x2 - bbox.x1,
+                        bbox.y2 - bbox.y1
+                    );
+                }
+                
+                // Draw label
+                if (showLabels) {
+                    const labelText = det.label + (showConfidence ? ` ${(det.confidence * 100).toFixed(0)}%` : '');
+                    const fontSize = Math.max(12, canvas.width / 60);
+                    ctx.font = `bold ${fontSize}px Arial`;
+                    
+                    const textMetrics = ctx.measureText(labelText);
+                    const textWidth = textMetrics.width;
+                    const textHeight = fontSize;
+                    const padding = 6;
+                    
+                    const labelX = bbox.x1 + offsetX;
+                    const labelY = bbox.y1 - textHeight - padding * 2 - 5;
+                    
+                    // Background
+                    ctx.fillStyle = color;
+                    ctx.fillRect(labelX, labelY, textWidth + padding * 2, textHeight + padding * 2);
+                    
+                    // Text
+                    ctx.fillStyle = 'white';
+                    ctx.fillText(labelText, labelX + padding, labelY + textHeight + padding - 2);
+                }
+            });
+        }
+        
+        function getFilteredDetections() {
+            return analysisData.detections.filter(det => 
+                det.confidence >= confidenceThreshold &&
+                enabledClasses.has(det.label)
+            );
+        }
+        
+        function updateDetectionList() {
+            const detectionList = document.getElementById('detectionList');
+            const filtered = getFilteredDetections();
+            
+            detectionList.innerHTML = '';
+            filtered.forEach(det => {
+                const div = document.createElement('div');
+                div.className = 'detection-item' + (highlightedDetection === det.id ? ' highlighted' : '');
+                div.onclick = () => highlightDetection(det.id);
+                div.innerHTML = `
+                    <div class="detection-header">
+                        <span class="detection-label">${det.label}</span>
+                        <span class="detection-confidence">${(det.confidence * 100).toFixed(1)}%</span>
+                    </div>
+                    <div class="detection-coords">
+                        x: ${det.bounding_box.x1.toFixed(0)}, y: ${det.bounding_box.y1.toFixed(0)}
+                    </div>
+                `;
+                detectionList.appendChild(div);
+            });
+            
+            document.getElementById('detectionCount').textContent = filtered.length;
+        }
+        
+        function highlightDetection(id) {
+            highlightedDetection = highlightedDetection === id ? null : id;
+            redrawCanvas();
+            updateDetectionList();
+        }
+        
+        function updateStats() {
+            const filtered = getFilteredDetections();
+            document.getElementById('totalFindings').textContent = analysisData.total_detections;
+            document.getElementById('visibleFindings').textContent = filtered.length;
+            document.getElementById('imageSize').textContent = 
+                `${analysisData.image_dimensions.width} × ${analysisData.image_dimensions.height}`;
+        }
+        
+        function zoomIn() {
+            zoomLevel = Math.min(zoomLevel + 0.2, 3);
+            applyZoom();
+        }
+        
+        function zoomOut() {
+            zoomLevel = Math.max(zoomLevel - 0.2, 0.5);
+            applyZoom();
+        }
+        
+        function resetZoom() {
+            zoomLevel = 1;
+            applyZoom();
+        }
+        
+        function applyZoom() {
+            canvas.style.transform = `scale(${zoomLevel})`;
+            document.getElementById('zoomLevel').textContent = `${Math.round(zoomLevel * 100)}%`;
+        }
+        
+        function exportResults() {
+            const link = document.createElement('a');
+            link.download = `dental_analysis_${Date.now()}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+        
+        function resetAnalysis() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
